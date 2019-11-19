@@ -1,0 +1,64 @@
+<h2><%= l(:notifications) %></h2>
+
+<%= form_tag(url_for( {:controller => "app_notifications", :action => "index"} ), method: "get") do %>
+	<%= check_box_tag(:viewed, 1, @viewed) %>
+	<%= label_tag(:viewed, l(:viewed_notification)) %>
+	<%= check_box_tag(:new, 1, @new) %>
+	<%= label_tag(:new, l(:new_notification)) %>
+	<%= submit_tag(l(:filter_button)) %>
+<% end %>
+<hr />
+
+<script>
+$(document).ready(function(){
+    $('.notice-list-title').click(function(){
+      var _id = $(this).attr('id');
+      $('#notice-list-' + _id).toggle();
+      return false;
+    });
+  });
+var locale_str_mark_as_unseen = "<%= l(:mark_as_unseen) %>";
+var locale_str_mark_as_seen = "<%= l(:mark_as_seen) %>";
+</script>
+
+<% @app_notifications.each do |notification| %>
+    <div class="notification <%= "new" if !notification.viewed %>">
+    <% if notification.similar_notices && notification.similar_notices.count > 1 %>
+        <% unless notification.issue.nil? %>
+	<h3><a class="notice-list-title" id="<%= notification.id %>" href="#">[<%=l(:text_issue)%>] #<%= notification.issue.id %> <%= notification.issue.subject %></a><a class="notice-count<%= "-seen" if notification.viewed %>" href="#"><%= notification.similar_notices.count %></a></h3>
+        <% end %>
+        <% unless notification.news.nil? %>
+            <h3><a class="notice-list-title" id="<%= notification.id %>" href="#">[<%=l(:text_news)%>] #<%= notification.news.id %> <%= notification.news.title %></a><a class="notice-count<%= "-seen" if notification.viewed %>" href="#"><%= notification.similar_notices.count %></a></h3>
+        <% end %>
+
+        <% if notification.similar_notices %>
+            <ol id="notice-list-<%= notification.id %>" style="display: none">
+                <% notification.similar_notices.each do |sn|  %>
+                <li>
+		<% if sn.is_edited? %>
+			<%= render :partial => 'issues/issue_edit', :formats => [:html], :locals => { :notification => sn, :journal => sn.journal, :journal_details => details_to_strings(sn.journal.visible_details(sn.author), false, :only_path => false) }%>
+		<% else %>
+			<%= render :partial => 'issues/issue_add', :formats => [:html], :locals => { :notification => sn }%>
+		<% end %>
+		<div>
+			<%= format_time(sn.created_on) %>
+		</div>
+		</li>
+                <% end %>
+            </ol> 
+        <% end %>
+    <% else %>
+        <% if notification.is_edited? %>
+            <%= render :partial => 'issues/issue_edit', :formats => [:html], :locals => { :notification => notification, :journal => notification.journal, :journal_details => details_to_strings(notification.journal.visible_details(notification.author), false, :only_path => false) }%>
+        <% else %>
+            <%= render :partial => 'issues/issue_add', :formats => [:html], :locals => { :notification => notification }%>
+        <% end %>
+
+    <% end %>
+    </div>
+<% end %>
+<% unless @app_notifications.empty? %>
+	<span class="pagination"><%= pagination_links_full @app_notifications_pages, @app_notifications_count %></span>
+<% end %>
+
+<%= button_to l(:mark_all_as_seen), action: "view_all" %>

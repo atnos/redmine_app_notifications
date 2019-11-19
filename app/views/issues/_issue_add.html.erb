@@ -1,0 +1,35 @@
+<% unless notification.issue.nil? %>
+<%if !notification.viewed %>
+	<a class="view-notification" href="<%= url_for(:controller => 'app_notifications', :action => 'view', :id => notification.id, :issue_id => notification.issue.id) %>">
+		<%= l(:mark_as_seen) %>
+	</a>
+<% else %>
+	<a class="view-notification" href="<%= url_for(:controller => 'app_notifications', :action => 'view', :id => notification.id, :issue_id => notification.issue.id, :mark_as_unseen => 1) %>">
+		<%= l(:mark_as_unseen) %>
+	</a>
+<% end %>
+<h3>
+	<%= avatar(notification.issue.author) %>
+	<a href="<%= url_for(:controller => 'app_notifications', :action => 'view', :id => notification.id, :issue_id => notification.issue.id) %>">
+		<strong><%= l(:text_issue_added, :id => "##{notification.issue.id} #{notification.issue.subject}", :author => h(notification.issue.author)) %></strong>
+	</a>
+</h3>
+<% end %>
+
+<% unless notification.news.nil? %>
+<%if !notification.viewed %>
+	<a class="view-notification" href="<%= url_for(:controller => 'app_notifications', :action => 'view', :id => notification.id, :news_id => notification.news.id) %>">
+		<%= l(:mark_as_seen) %>
+	</a>
+<% else %>
+	<a class="view-notification" href="<%= url_for(:controller => 'app_notifications', :action => 'view', :id => notification.id, :news_id => notification.news.id, :mark_as_unseen => 1) %>">
+		<%= l(:mark_as_unseen) %>
+	</a>
+<% end %>
+<h3>
+	<%= avatar(notification.news.author) %>
+	<a href="<%= url_for(:controller => 'app_notifications', :action => 'view', :id => notification.id, :news_id => notification.news.id) %>">
+		<strong><%= l(:text_news_added, :id => "##{notification.news.id} #{notification.news.title}", :author => h(notification.news.author)) %></strong>
+	</a>
+</h3>
+<% end %>

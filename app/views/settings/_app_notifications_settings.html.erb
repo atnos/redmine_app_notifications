@@ -1,0 +1,22 @@
+<table>
+  <tbody>
+    <th><%= l(:notifications_events_settings) %></th>
+    <% ["issue_added", "issue_updated", "issue_note_added", "issue_status_updated", "issue_assigned_to_updated", "issue_priority_updated", "user_mentioned"].each do |str| %>
+      <tr>
+        <td>
+          <input id="settings_<%= str %>" type="checkbox" name="settings[<%= str %>]" <%= "checked" if settings.include? str %>>
+          <%= l(str.to_sym) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <th><%= l(:faye_server_adress) %></th>
+      <td>
+        <input type="text" id="faye_server_adress" value="<%= settings['faye_server_adress'] %>" name="settings[faye_server_adress]" >
+      </td>
+  </tbody>
+</table>
