@@ -1,7 +1,7 @@
 <table>
   <tbody>
     <th><%= l(:notifications_events_settings) %></th>
-    <% ["issue_added", "issue_updated", "issue_note_added", "issue_status_updated", "issue_assigned_to_updated", "issue_priority_updated", "user_mentioned"].each do |str| %>
+    <% ["issue_added", "issue_updated", "issue_note_added", "issue_status_updated", "issue_assigned_to_updated", "issue_priority_updated", "user_mentioned", 'use_polling'].each do |str| %>
       <tr>
         <td>
           <input id="settings_<%= str %>" type="checkbox" name="settings[<%= str %>]" <%= "checked" if settings.include? str %>>

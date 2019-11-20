@@ -5,8 +5,25 @@ class AppNotificationsController < ApplicationController
   helper :custom_fields
   helper :issues
 
+  def fetch_new_issue
+    @app_notifications = AppNotification.where(recipient_id: User.current.id, viewed: false)
+   apps = AppNotification.where(recipient_id: User.current.id, viewed: false).where('created_on >= ?', 5.seconds.ago)
+   json = apps.map do |app|
+     issue = app.issue
+     id = app.id
+     author= issue.author
+     message_text  = if app.is_edited?
+                       I18n.t(:text_issue_updated, :id => "##{issue.id}", :author => author)
+                     else
+                       I18n.t(:text_issue_added, :id => "##{issue.id}", :author => author)
+                     end
+     { count: @app_notifications.count, message: message_text, id: id, avatar: gravatar_url(author.mail, { :default => Setting.gravatar_default })}
+   end
+    render json: {datas: json}
+  end
+
   def index
-    @app_notifications = AppNotification.includes(:issue, :author, :journal, :news).where(recipient_id: User.current.id).group('issue_id', 'article_id', 'news_id','id').order(created_on: :desc)
+    @app_notifications = AppNotification.includes(:issue, :author, :journal, :news).where(recipient_id: User.current.id).group('issue_id', 'article_id', 'news_id', 'id').order(created_on: :desc)
     if request.xhr?
       @app_notifications = @app_notifications.limit(5)
       render :partial => "ajax"
@@ -28,7 +45,8 @@ class AppNotificationsController < ApplicationController
       @app_notifications = @app_notifications.where(viewed: false) if @new
     end
     @limit = 10
-    @app_notifications_pages = Paginator.new @app_notifications, @limit, params['page']
+
+    @app_notifications_pages = Redmine::VERSION::MAJOR > 3 ? (Paginator.new @app_notifications, @limit, params['page']) : (Paginator.new @app_notifications.count(:id).length, @limit, params['page'])
     @offset ||= @app_notifications_pages.offset
     @app_notifications = @app_notifications.limit(@limit).offset(@offset)
   end
