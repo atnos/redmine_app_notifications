@@ -12,13 +12,12 @@ Redmine::Plugin.register :redmine_app_notifications do
   	:if => Proc.new { User.current.app_notification },
     :html => {:id => 'notificationsLink'}
   }
-  menu :top_menu, :app_notifications_count, { :controller => 'app_notifications', :action => 'index' }, {
-      :caption => Proc.new { AppNotification.where(recipient_id: User.current.id, viewed: false).count.to_s },
-      :last => true,
-      before: :notifications,
-      :if => Proc.new { User.current.app_notification && AppNotification.where(recipient_id: User.current.id, viewed: false).count > 0 },
-      :html => {:id => 'notification_count'}
-  }
+  # menu :top_menu, :app_notifications_count, { :controller => 'app_notifications', :action => 'index' }, {
+  #     :caption => Proc.new { AppNotification.where(recipient_id: User.current.id, viewed: false).count.to_s },
+  #     :last => true,
+  #     :if => Proc.new { User.current.app_notification && AppNotification.where(recipient_id: User.current.id, viewed: false).count > 0 },
+  #     :html => {:id => 'notification_count'}
+  # }
 
 
   settings :default => {

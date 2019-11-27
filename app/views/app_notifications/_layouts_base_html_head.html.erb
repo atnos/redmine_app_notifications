@@ -6,7 +6,7 @@
 	function fetch_new_issue(){
 
 		if($("#notification_count").length == 0) {
-			$("#notificationsLink").parent().before("<li><span id='notification_count'></span></li>");
+			$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
 		}
 		var useDesktopNotifications = false;
 		<% if User.current.app_notification_desktop %>
