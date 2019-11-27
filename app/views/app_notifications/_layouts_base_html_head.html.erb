@@ -1,79 +1,57 @@
 <% content_for :header_tags do %>
 	<%= javascript_include_tag "app_notifications", :plugin => "redmine_app_notifications" %>
 	<%= stylesheet_link_tag "app_notifications", :plugin => "redmine_app_notifications" %>
-	<% if Setting.plugin_redmine_app_notifications['use_polling'] && User.current.logged? %>
-<script>
-	function fetch_new_issue(){
-
-		if($("#notification_count").length == 0) {
-			$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
-		}
-		var useDesktopNotifications = false;
-		<% if User.current.app_notification_desktop %>
-		useDesktopNotifications = true;
-		<% end %>
-		$.ajax({
-				url: "<%= fetch_new_issue_path(format: :html) %>",
-				type: 'POST',
-				beforeSend: function() {$('#ajax-indicator').css('opacity', '0');},
-				complete: function() {$('#ajax-indicator').css('opacity', '1');
-				$('#ajax-indicator').hide()},
-				success: function(json){
-					setTimeout(function(){
-						fetch_new_issue()
-					}, 5000)
-					datas = json.datas;
-					for(i = 0; i < datas.length; i++)
-					{
-						data = datas[i]
-
-						$("#notification_count").text(data.count);
-
-
-						if (!("Notification" in window) || !useDesktopNotifications) {
-							$(document.body).append("<div class='push-notification hide' id='notification-" + data.id + "'>" + data.message + "</div>");
-							$("#notification-" + data.id).fadeIn('fast').delay(10000).fadeOut(1200, function() {
-								$("#notification-" + data.id).remove();
-							});
-						}
-						else {
-							if (Notification.permission === "granted")
-								showNotification(data);
-							else if (Notification.permission !== "denied") {
-								Notification.requestPermission(function(permission) {
-									if (permission === "granted")
-										showNotification(data);
-								});
-							}
-						}
-					}
-
-				}
-			})
-	}
-	function getIssueIdFromMessage(message)
-	{
-		return message.match(/#(\d+)/)[1];
-	}
-
-	function showNotification(data)
-	{
-		var notification = new Notification("Redmine", { "tag": "notification-"+getIssueIdFromMessage(data.message), "body": data.message, "icon": data.avatar });
-		notification.onclick = function(x) {
-			window.focus();
-			var issueId = getIssueIdFromMessage(this.body);
-			this.close();
-			location.href = "<%= url_for(:controller => 'app_notifications', :action => 'index') %>/"+data.id+"?issue_id="+issueId;
-		};
-	}
-	$(document).ready(function(){
-		fetch_new_issue()
-	})
-</script>
-	<% else %>
-		<% unless Setting.plugin_redmine_app_notifications['faye_server_adress'].empty? %>
-			<%= javascript_include_tag "#{Setting.plugin_redmine_app_notifications['faye_server_adress']}/faye.js" %>
+	<% if User.current.logged? %>
+		<% if Setting.plugin_redmine_app_notifications['use_polling'] %>
 			<script>
+				function fetch_new_issue(){
+
+					if($("#notification_count").length == 0) {
+						$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
+					}
+					var useDesktopNotifications = false;
+					<% if User.current.app_notification_desktop %>
+					useDesktopNotifications = true;
+					<% end %>
+					$.ajax({
+						url: "<%= fetch_new_issue_path(format: :html) %>",
+						type: 'POST',
+						beforeSend: function() {$('#ajax-indicator').css('opacity', '0');},
+						complete: function() {$('#ajax-indicator').css('opacity', '1');
+							$('#ajax-indicator').hide()},
+						success: function(json){
+							setTimeout(function(){
+								fetch_new_issue()
+							}, 5000)
+							datas = json.datas;
+							for(i = 0; i < datas.length; i++)
+							{
+								data = datas[i]
+
+								$("#notification_count").text(data.count);
+
+
+								if (!("Notification" in window) || !useDesktopNotifications) {
+									$(document.body).append("<div class='push-notification hide' id='notification-" + data.id + "'>" + data.message + "</div>");
+									$("#notification-" + data.id).fadeIn('fast').delay(10000).fadeOut(1200, function() {
+										$("#notification-" + data.id).remove();
+									});
+								}
+								else {
+									if (Notification.permission === "granted")
+										showNotification(data);
+									else if (Notification.permission !== "denied") {
+										Notification.requestPermission(function(permission) {
+											if (permission === "granted")
+												showNotification(data);
+										});
+									}
+								}
+							}
+
+						}
+					})
+				}
 				function getIssueIdFromMessage(message)
 				{
 					return message.match(/#(\d+)/)[1];
@@ -89,45 +67,69 @@
 						location.href = "<%= url_for(:controller => 'app_notifications', :action => 'index') %>/"+data.id+"?issue_id="+issueId;
 					};
 				}
-
-				$(document).ready(function()
-				{
-					try {
-						var client = new Faye.Client("<%= Setting.plugin_redmine_app_notifications['faye_server_adress'] %>");
-					} catch(e) {
-						$("#notificationsLink").parent().after("<li><span class=\"notification-title\">(<%= l(:unreachable_faye_server) %>)</span></li>");
-						return true;
+				$(document).ready(function(){
+					fetch_new_issue()
+				})
+			</script>
+		<% else %>
+			<% unless Setting.plugin_redmine_app_notifications['faye_server_adress'].empty? %>
+				<%= javascript_include_tag "#{Setting.plugin_redmine_app_notifications['faye_server_adress']}/faye.js" %>
+				<script>
+					function getIssueIdFromMessage(message)
+					{
+						return message.match(/#(\d+)/)[1];
 					}
 
-					var private_subscription = client.subscribe('/notifications/private/<%= User.current.id %>', function(data) {
-						if($("#notification_count").length == 0) {
-							$("#notificationsLink").parent().before("<li><span id='notification_count'></span></li>");
-						}
-						$("#notification_count").text(data.count);
-						var useDesktopNotifications = false;
-						<% if User.current.app_notification_desktop %>
-						useDesktopNotifications = true;
-						<% end %>
+					function showNotification(data)
+					{
+						var notification = new Notification("Redmine", { "tag": "notification-"+getIssueIdFromMessage(data.message), "body": data.message, "icon": data.avatar });
+						notification.onclick = function(x) {
+							window.focus();
+							var issueId = getIssueIdFromMessage(this.body);
+							this.close();
+							location.href = "<%= url_for(:controller => 'app_notifications', :action => 'index') %>/"+data.id+"?issue_id="+issueId;
+						};
+					}
 
-						if (!("Notification" in window) || !useDesktopNotifications) {
-							$(document.body).append("<div class='push-notification hide' id='notification-" + data.id + "'>" + data.message + "</div>");
-							$("#notification-" + data.id).fadeIn('fast').delay(10000).fadeOut(1200, function() {
-								$("#notification-" + data.id).remove();
-							});
+					$(document).ready(function()
+					{
+						try {
+							var client = new Faye.Client("<%= Setting.plugin_redmine_app_notifications['faye_server_adress'] %>");
+						} catch(e) {
+							$("#notificationsLink").parent().after("<li><span class=\"notification-title\">(<%= l(:unreachable_faye_server) %>)</span></li>");
+							return true;
 						}
-						else {
-							if (Notification.permission === "granted")
-								showNotification(data);
-							else if (Notification.permission !== "denied") {
-								Notification.requestPermission(function(permission) {
-									if (permission === "granted")
-										showNotification(data);
+
+						var private_subscription = client.subscribe('/notifications/private/<%= User.current.id %>', function(data) {
+							if($("#notification_count").length == 0) {
+								$("#notificationsLink").parent().before("<li><span id='notification_count'></span></li>");
+							}
+							$("#notification_count").text(data.count);
+							var useDesktopNotifications = false;
+							<% if User.current.app_notification_desktop %>
+							useDesktopNotifications = true;
+							<% end %>
+
+							if (!("Notification" in window) || !useDesktopNotifications) {
+								$(document.body).append("<div class='push-notification hide' id='notification-" + data.id + "'>" + data.message + "</div>");
+								$("#notification-" + data.id).fadeIn('fast').delay(10000).fadeOut(1200, function() {
+									$("#notification-" + data.id).remove();
 								});
 							}
-						}
+							else {
+								if (Notification.permission === "granted")
+									showNotification(data);
+								else if (Notification.permission !== "denied") {
+									Notification.requestPermission(function(permission) {
+										if (permission === "granted")
+											showNotification(data);
+									});
+								}
+							}
+						});
 					});
-				});
-			</script>
+				</script>
+			<% end %>
 		<% end %>
 	<% end %>
 <% end %>
