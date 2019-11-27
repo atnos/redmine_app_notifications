@@ -23,7 +23,7 @@ class AppNotificationsController < ApplicationController
   end
 
   def index
-    @app_notifications = AppNotification.includes(:issue, :author, :journal, :news).where(recipient_id: User.current.id).group('issue_id', 'article_id', 'news_id', 'id').order(created_on: :desc)
+    @app_notifications = AppNotification.includes(:issue, :author, :journal, :news).where(recipient_id: User.current.id).order(created_on: :desc)
     if request.xhr?
       @app_notifications = @app_notifications.limit(5)
       render :partial => "ajax"
@@ -45,8 +45,8 @@ class AppNotificationsController < ApplicationController
       @app_notifications = @app_notifications.where(viewed: false) if @new
     end
     @limit = 10
-
-    @app_notifications_pages = Redmine::VERSION::MAJOR > 3 ? (Paginator.new @app_notifications, @limit, params['page']) : (Paginator.new @app_notifications.count(:id).length, @limit, params['page'])
+    @app_notifications_count = @app_notifications.to_a.length
+    @app_notifications_pages = Redmine::VERSION::MAJOR > 3 ? (Paginator.new @app_notifications.to_a.length, @limit, params['page']) : (Paginator.new @app_notifications.count(:id).length, @limit, params['page'])
     @offset ||= @app_notifications_pages.offset
     @app_notifications = @app_notifications.limit(@limit).offset(@offset)
   end
