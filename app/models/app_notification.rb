@@ -22,21 +22,29 @@ class AppNotification < ActiveRecord::Base
 	end
 
 	def message_text
-		if is_edited?
-			I18n.t(:text_issue_updated, :id => "##{issue.id}", :author => author)
-		else
-			I18n.t(:text_issue_added, :id => "##{issue.id}", :author => author)
+		if self.issue
+			if is_edited?
+				I18n.t(:text_issue_updated, :id => "##{issue.id}", :author => author)
+			else
+				I18n.t(:text_issue_added, :id => "##{issue.id}", :author => author)
+			end
+		elsif self.news
+			if is_edited?
+				I18n.t(:text_issue_updated, :id => "##{news.id}", :author => author)
+			else
+				I18n.t(:text_issue_added, :id => "##{news.id}", :author => author)
+			end
 		end
 	end
 
-        def similar_notices
-                @notices = AppNotification.where(recipient_id: self.recipient.id, viewed: self.viewed)
-                if not self.issue.nil?
-                        @notices = @notices.where(issue_id: self.issue.id).all
-                elsif not self.news.nil?
-                        @notices = @notices.where(news_id: self.news.id).all
-                else
-                        @notices = nil
-                end
-        end
+	def similar_notices
+		@notices = AppNotification.where(recipient_id: self.recipient.id, viewed: self.viewed)
+		if not self.issue.nil?
+			@notices = @notices.where(issue_id: self.issue.id).all
+		elsif not self.news.nil?
+			@notices = @notices.where(news_id: self.news.id).all
+		else
+			@notices = nil
+		end
+	end
 end

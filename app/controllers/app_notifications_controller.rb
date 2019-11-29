@@ -6,7 +6,7 @@ class AppNotificationsController < ApplicationController
   helper :issues
 
   def fetch_new_issue
-    @app_notifications = AppNotification.where(recipient_id: User.current.id, viewed: false)
+    @app_notifications = AppNotification.where(recipient_id: User.current.id, viewed: false).where.not(issue_id: nil)
    apps = AppNotification.where(recipient_id: User.current.id, viewed: false).where('created_on >= ?', 5.seconds.ago)
    json = apps.map do |app|
      issue = app.issue
