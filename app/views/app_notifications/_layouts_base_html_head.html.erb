@@ -102,7 +102,7 @@
 
 						var private_subscription = client.subscribe('/notifications/private/<%= User.current.id %>', function(data) {
 							if($("#notification_count").length == 0) {
-								$("#notificationsLink").parent().before("<li><span id='notification_count'></span></li>");
+								$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
 							}
 							$("#notification_count").text(data.count);
 							var useDesktopNotifications = false;
@@ -141,6 +141,9 @@
 		url: "/app-notifications/unread-number/",
 		dataType: 'json',
 		success: function(data) {
+        if($("#notification_count").length == 0) {
+            $("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
+        }
 			$("#notification_count").text(data);
 			$("#notification_count").show();
 		}
