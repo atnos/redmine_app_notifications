@@ -24,13 +24,13 @@ class AppNotification < ActiveRecord::Base
 	def message_text
 		if self.issue
 			if is_edited?
-				I18n.t(:text_issue_updated, :id => "##{issue.id}", :author => author)
+				I18n.t(:text_issue_updated, :id => "##{issue.id}", :author => journal.user)
 			else
 				I18n.t(:text_issue_added, :id => "##{issue.id}", :author => author)
 			end
 		elsif self.news
 			if is_edited?
-				I18n.t(:text_issue_updated, :id => "##{news.id}", :author => author)
+				I18n.t(:text_issue_updated, :id => "##{news.id}", :author => journal.user)
 			else
 				I18n.t(:text_issue_added, :id => "##{news.id}", :author => author)
 			end

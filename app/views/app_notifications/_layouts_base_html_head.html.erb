@@ -7,7 +7,7 @@
 				function fetch_new_issue(){
 
 					if($("#notification_count").length == 0) {
-						$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'>0</a></li>");
+						$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='#' style='cursor: pointer;'>0</a></li>");
 					}
 					var useDesktopNotifications = false;
 					<% if User.current.app_notification_desktop %>
@@ -22,7 +22,7 @@
 						success: function(json){
 							setTimeout(function(){
 								fetch_new_issue()
-							}, 5000)
+							}, 30000)
 							datas = json.datas;
 							for(i = 0; i < datas.length; i++)
 							{
@@ -102,7 +102,7 @@
 
 						var private_subscription = client.subscribe('/notifications/private/<%= User.current.id %>', function(data) {
 							if($("#notification_count").length == 0) {
-								$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
+								$("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='#' style='cursor: pointer;'></a></li>");
 							}
 							$("#notification_count").text(data.count);
 							var useDesktopNotifications = false;
@@ -142,7 +142,7 @@
 		dataType: 'json',
 		success: function(data) {
         if($("#notification_count").length == 0) {
-            $("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='/app-notifications' style='cursor: pointer;'></a></li>");
+            $("#notificationsLink").parent().before("<li><a id='notification_count' class='app-notifications-count' href='#' style='cursor: pointer;'></a></li>");
         }
 			$("#notification_count").text(data);
 			$("#notification_count").show();

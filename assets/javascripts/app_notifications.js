@@ -6,7 +6,7 @@ function urlSetParam(uri, key, val) {
 
 $(document).ready(function()
 {
-	$("#notificationsLink").click(function()
+	$("#notificationsLink,#notification_count").click(function()
 	{
 		$("#notificationsContainer").remove();
 
@@ -80,12 +80,12 @@ $(document).ready(function()
 	});
 
 
-
+/*
         $("#notification_count").click(function()
         {
             window.open("/app-notifications/", "_blank");
         });
-
+*/
         $("#notification_count").hover(function()
         {
             $(this).css("cursor","pointer");

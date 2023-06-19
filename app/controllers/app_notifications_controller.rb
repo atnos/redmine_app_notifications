@@ -11,7 +11,7 @@ class AppNotificationsController < ApplicationController
    json = apps.map do |app|
      issue = app.issue
      id = app.id
-     author= issue.author
+     author = app.is_edited? ? app.journal.user : issue.author
      message_text  = if app.is_edited?
                        I18n.t(:text_issue_updated, :id => "##{issue.id}", :author => author)
                      else

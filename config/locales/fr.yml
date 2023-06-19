@@ -13,6 +13,7 @@ fr:
   issue_priority_updated: "Priorité de demande mise à jour"
   faye_server_adress: "Adresse du serveur Faye (laisser vide pour désactiver)"
   mark_as_seen: "Marquer comme vu"
+  mark_as_unseen: "Marquer comme non vu"
   mark_all_as_seen: "Tout marquer comme vu"
   viewed_notification: "Notifications vues"
   new_notification: "Notifications Annonces"

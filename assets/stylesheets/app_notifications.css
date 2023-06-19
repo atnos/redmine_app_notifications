@@ -70,7 +70,8 @@ a.notice-count-seen {
 }
 .notification-container {
 	padding: 10px 15px;
-	background-color: #FCFCFF
+	background-color: #FCFCFF;
+	position: relative;
 }
 .notification-container:hover {
 	background-color: #FFFFFF;
@@ -118,6 +119,14 @@ a.notice-count-seen {
 
 a.view-notification {
 	float: right;
+}
+.link-spanner {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	z-index: 1;
 }
 #top-menu li #notificationsBody .notification-content a {
         background: none;
